@@ -162,11 +162,11 @@ function mostrarResultados(estaciones) {
     agregarEstaciones(tablaDistanciaPrecio, estacionesOrdenadasPorDistanciaPrecio);
 }
 
-document.getElementById('buscarCercanas').addEventListener('click', buscarGasolinerasCercanas);
-
-document.getElementById('rango').addEventListener('keydown', function(event) {
+// Disparar la búsqueda al presionar Enter
+document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
-        event.preventDefault();
-        buscarGasolinerasCercanas();
+        document.getElementById('buscarCercanas').click();
     }
 });
+
+document.getElementById('buscarCercanas').addEventListener('click', buscarGasolinerasCercanas);
