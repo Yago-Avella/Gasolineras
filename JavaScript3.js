@@ -45,16 +45,8 @@ function buscarGasolinerasCercanas() {
             usuarioLongitud = longitude;
             mapa.setView([latitude, longitude], 13);
 
-            // Marcador del usuario (con una flecha)
-            const marcadorUsuario = L.marker([latitude, longitude], {
-                title: 'Tu ubicación',
-                icon: L.icon({
-                    iconUrl: 'https://example.com/user-arrow.png', // Reemplaza con la URL de tu icono de flecha
-                    iconSize: [32, 32], // Tamaño del icono
-                    iconAnchor: [16, 32], // Ajustar anclaje al centro de la base de la flecha
-                    popupAnchor: [0, -32], // Ajustar la posición del popup
-                }),
-            }).addTo(mapa);
+            // Marcador del usuario
+            L.marker([latitude, longitude], { title: 'Tu ubicación' }).addTo(mapa);
 
             fetch(API_URL)
                 .then((response) => response.json())
@@ -62,18 +54,17 @@ function buscarGasolinerasCercanas() {
                     const estaciones = data.ListaEESSPrecio.filter((estacion) => {
                         const lat = parseFloat(estacion.Latitud.replace(',', '.'));
                         const lon = parseFloat(estacion['Longitud (WGS84)'].replace(',', '.'));
-                        const precioGasoleo = parseFloat(estacion['Precio Gasoleo A']?.replace(',', '.'));
-                        const precioGasolina = parseFloat(estacion['Precio Gasolina 95 E5']?.replace(',', '.'));
 
-                        if (!lat || !lon || isNaN(precioGasoleo) || isNaN(precioGasolina)) {
-                            return false; // Excluir estaciones sin datos válidos
+                        if (isNaN(lat) || isNaN(lon)) {
+                            console.warn(`Coordenadas inválidas para la estación: ${estacion.Dirección}`);
+                            return false;
                         }
 
                         const distancia = calcularDistancia(latitude, longitude, lat, lon);
+
                         return distancia <= rango; // Solo estaciones dentro del rango
                     });
 
-                    // Ordenar las estaciones por rentabilidad (distancia y precio)
                     const estacionesOrdenadas = estaciones.map((estacion) => {
                         const lat = parseFloat(estacion.Latitud.replace(',', '.'));
                         const lon = parseFloat(estacion['Longitud (WGS84)'].replace(',', '.'));
@@ -84,9 +75,10 @@ function buscarGasolinerasCercanas() {
                         return {
                             ...estacion,
                             distancia,
-                            precioGasoleo,
-                            precioGasolina,
-                            rentabilidad: (distancia + Math.min(precioGasoleo, precioGasolina)) / 2, // Media entre distancia y precio
+                            municipio: estacion.Municipio || 'Desconocido',
+                            precioGasoleo: isNaN(precioGasoleo) ? null : precioGasoleo,
+                            precioGasolina: isNaN(precioGasolina) ? null : precioGasolina,
+                            rentabilidad: (distancia + Math.min(precioGasoleo || Infinity, precioGasolina || Infinity)) / 2,
                         };
                     });
 
@@ -109,9 +101,9 @@ function mostrarResultados(estaciones) {
     tablaDistancia.innerHTML = '';
     tablaDistanciaPrecio.innerHTML = '';
 
-    // Ordenar las estaciones según el criterio adecuado para cada tabla
     const estacionesOrdenadasPorPrecio = [...estaciones].sort((a, b) => {
-        return Math.min(a.precioGasoleo, a.precioGasolina) - Math.min(b.precioGasoleo, b.precioGasolina);
+        return Math.min(a.precioGasoleo || Infinity, a.precioGasolina || Infinity) -
+               Math.min(b.precioGasoleo || Infinity, b.precioGasolina || Infinity);
     });
 
     const estacionesOrdenadasPorDistancia = [...estaciones].sort((a, b) => {
@@ -122,53 +114,59 @@ function mostrarResultados(estaciones) {
         return a.rentabilidad - b.rentabilidad;
     });
 
-    // Función para agregar estaciones a la tabla
     function agregarEstaciones(tabla, estacionesOrdenadas) {
         estacionesOrdenadas.forEach((estacion) => {
             const lat = parseFloat(estacion.Latitud.replace(',', '.'));
             const lon = parseFloat(estacion['Longitud (WGS84)'].replace(',', '.'));
-            const precioGasoleo = parseFloat(estacion['Precio Gasoleo A']?.replace(',', '.'));
-            const precioGasolina = parseFloat(estacion['Precio Gasolina 95 E5']?.replace(',', '.'));
             const distancia = estacion.distancia.toFixed(2);
 
-            const precio = Math.min(precioGasoleo, precioGasolina).toFixed(2);
-            const tipoGasolina = precioGasoleo < precioGasolina ? 'Gasóleo A' : 'Gasolina 95 E5';
+            let preciosHTML = '';
+            if (estacion.precioGasoleo !== null) {
+                preciosHTML += `<p><strong>Gasóleo A:</strong> ${estacion.precioGasoleo.toFixed(2)} €/L</p>`;
+            }
+            if (estacion.precioGasolina !== null) {
+                preciosHTML += `<p><strong>Gasolina 95 E5:</strong> ${estacion.precioGasolina.toFixed(2)} €/L</p>`;
+            }
+
             const enlaceGoogleMaps = `https://www.google.com/maps?saddr=${usuarioLatitud},${usuarioLongitud}&daddr=${lat},${lon}&directionsmode=driving`;
 
-            // Agregar marcador de gasolinera en el mapa
-            L.marker([lat, lon]).addTo(mapa)
-                .bindPopup(`
-                    <b>${estacion.Dirección}</b><br>
-                    Precio: ${precio} €/L<br>
-                    Tipo: ${tipoGasolina}<br>
-                    Distancia: ${distancia} km
-                `);
+            const marcador = L.marker([lat, lon]).addTo(mapa);
+            marcador.bindPopup(`
+                <a href="${enlaceGoogleMaps}" target="_blank" style="text-decoration: none; color: inherit; display: block;">
+                    <div style="padding: 10px; text-align: left;">
+                        <b>${estacion.Dirección}</b><br>
+                        <p><strong>Municipio:</strong> ${estacion.municipio}</p>
+                        ${preciosHTML}
+                        <p>Distancia: ${distancia} km</p>
+                    </div>
+                </a>
+            `);
+
+            marcador.on('dblclick', () => {
+                window.open(enlaceGoogleMaps, '_blank');
+            });
 
             tabla.innerHTML += `
-                <div class="recuadro-gasolineras">
+                <a href="${enlaceGoogleMaps}" target="_blank" class="recuadro-gasolineras">
                     <p><strong>Dirección:</strong> ${estacion.Dirección}</p>
-                    <p><strong>Precio:</strong> ${precio} €/L</p>
-                    <p><strong>Tipo:</strong> ${tipoGasolina}</p>
+                    <p><strong>Municipio:</strong> ${estacion.municipio}</p>
+                    ${preciosHTML}
                     <p><strong>Distancia:</strong> ${distancia} km</p>
-                    <button onclick="window.open('${enlaceGoogleMaps}', '_blank')">Ver en Google Maps</button>
-                </div>
+                </a>
             `;
         });
     }
 
-    // Mostrar las estaciones ordenadas en cada tabla
     agregarEstaciones(tablaPrecio, estacionesOrdenadasPorPrecio);
     agregarEstaciones(tablaDistancia, estacionesOrdenadasPorDistancia);
     agregarEstaciones(tablaDistanciaPrecio, estacionesOrdenadasPorDistanciaPrecio);
 }
 
-// Evento para ejecutar la función de buscar gasolineras al hacer click
 document.getElementById('buscarCercanas').addEventListener('click', buscarGasolinerasCercanas);
 
-// Evento para ejecutar la búsqueda al presionar "Enter" en el campo de rango
 document.getElementById('rango').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Evitar el envío del formulario si está dentro de uno
-        buscarGasolinerasCercanas(); // Llamar a la función de búsqueda
+        event.preventDefault();
+        buscarGasolinerasCercanas();
     }
 });

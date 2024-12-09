@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f7f7f7;
+    background-color: #e8f4f8;
 }
 
 .contenedor {
@@ -14,70 +14,81 @@ body {
 h1 {
     text-align: center;
     margin-bottom: 20px;
+    color: #004d40;
 }
 
 .formulario {
     display: flex;
     justify-content: center;
+    align-items: center; /* Alinear elementos verticalmente */
     margin-bottom: 20px;
+    gap: 10px; /* Espacio entre elementos */
+}
+
+.formulario label {
+    font-weight: bold; /* Negrita para el texto */
+    text-align: center; /* Centrado horizontal */
 }
 
 input[type="number"] {
     padding: 8px;
     font-size: 16px;
     width: 100px;
-    margin-right: 10px;
+    border: 1px solid #00796b;
+    border-radius: 5px;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
+    background-color: #00796b;
     color: white;
+    padding: 10px 15px;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #004d40;
 }
 
 #mapa {
     height: 500px;
     margin-bottom: 20px;
+    border: 2px solid #00796b;
+    border-radius: 10px;
 }
 
 .resultados {
     display: flex;
     justify-content: space-between;
+    gap: 20px;
 }
 
 .tabla {
     width: 32%;
-    background-color: #f0f0f0;
-    padding: 10px;
+    background-color: #ffffff;
+    padding: 15px;
     border-radius: 10px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
 }
 
 .recuadro-gasolineras {
     background-color: white;
     padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.recuadro-gasolineras button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.recuadro-gasolineras button:hover {
-    background-color: #0056b3;
+.recuadro-gasolineras:hover {
+    background-color: #c8e6c9;
+    transform: scale(1.02);
 }
 
 .recuadro-gasolineras p {
@@ -86,4 +97,9 @@ button:hover {
 
 .recuadro-gasolineras strong {
     font-weight: bold;
+}
+
+h3 {
+    color: #004d40;
+    text-align: center;
 }
