@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Gasolineras Cercanas</title>
+    <link rel="stylesheet" href="HojaEstilos3.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Buscar Gasolineras Cercanas</h1>
+
+        <div class="formulario">
+            <label for="rango">Rango (km):</label>
+            <input type="number" id="rango" value="10" min="1" />
+            <button id="buscarCercanas">Buscar Gasolineras</button>
+        </div>
+
+        <div id="mapa"></div>
+
+        <div id="resultados" class="resultados">
+            <div class="tabla" id="tablaPrecio">
+                <h3>Ordenado por Precio</h3>
+                <div class="gasolinera" id="precio"></div>
+            </div>
+
+            <div class="tabla" id="tablaDistancia">
+                <h3>Ordenado por Distancia</h3>
+                <div class="gasolinera" id="distancia"></div>
+            </div>
+
+            <div class="tabla" id="tablaDistanciaPrecio">
+                <h3>Ordenado por Distancia y Precio</h3>
+                <div class="gasolinera" id="distanciaPrecio"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="JavaScript3.js"></script>
+</body>
+</html>
