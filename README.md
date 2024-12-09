@@ -1,6 +1,8 @@
 He creado una web la cual se utiliza para buscar las gasolineras a X km de cercanía tuya en linea recta, itroduces los kilometros que quieres y te ordena según diferentes valores como precio y Distancia las gasolineras con el precio de la gasolina. 
-Además tienes un mapa en el que puedes ver donde estan estas gasolineras con enlaces a google maps para poder llegar a estas
+Además tienes un mapa en el que puedes ver donde estan estas gasolineras con enlaces a google maps para poder llegar a estas.
+
 HTML3.html
+
 Define la estructura de la página web y los elementos visuales principales:
 
 Encabezado:
