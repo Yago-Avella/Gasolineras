@@ -59,3 +59,5 @@ Mapa interactivo:
   Botón para buscar gasolineras.
   Presionar "Enter" activa el botón de búsqueda automáticamente.
   Doble clic en los marcadores lleva directamente a la dirección en Google Maps.
+
+  En mi opinión, mi nota deberia ser un 8 ya que pese a algunos fallos se ve bastante bien
